@@ -1,0 +1,2241 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wambua Kilonzo & Co. Advs. — Court Diary</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #172033;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.header {
+    background: #0d2b52;
+    color: white;
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.brand {
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: .3px;
+}
+
+.brand-sub {
+    font-size: 12px;
+    opacity: .75;
+    margin-top: 4px;
+}
+
+.today {
+    text-align: right;
+    font-size: 14px;
+}
+
+.container {
+    max-width: 1450px;
+    margin: auto;
+    padding: 22px;
+}
+
+/* STATIONS */
+
+.station-bar {
+    background: white;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    margin-bottom: 18px;
+}
+
+.station-tab {
+    border: 0;
+    background: #edf2f7;
+    color: #24364d;
+    padding: 10px 15px;
+    border-radius: 8px;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.station-tab.active {
+    background: #1769aa;
+    color: white;
+}
+
+.add-station {
+    background: #e8f4ff;
+    color: #1769aa;
+}
+
+/* MENU */
+
+.menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.menu button {
+    border: 1px solid #d8e0ea;
+    background: white;
+    color: #26374e;
+    padding: 10px 15px;
+    border-radius: 8px;
+}
+
+.menu button.active {
+    background: #1769aa;
+    color: white;
+    border-color: #1769aa;
+}
+
+/* TOOLBAR */
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.search {
+    flex: 1;
+    min-width: 240px;
+}
+
+.search input {
+    width: 100%;
+    border: 1px solid #d5dde7;
+    background: white;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.primary {
+    background: #1769aa;
+    color: white;
+    border: 0;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+/* MATTERS */
+
+.section-heading {
+    font-size: 24px;
+    margin: 5px 0 16px;
+}
+
+.station-heading {
+    font-size: 21px;
+    font-weight: 800;
+    margin: 24px 0 9px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #d9e2ec;
+}
+
+.matter-list {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.matter-row {
+    display: grid;
+    grid-template-columns: 130px minmax(180px, 1.5fr) 1fr 150px 170px 130px;
+    gap: 15px;
+    align-items: center;
+    padding: 16px 18px;
+    border-bottom: 1px solid #e8edf3;
+}
+
+.matter-row:last-child {
+    border-bottom: 0;
+}
+
+.matter-row:hover {
+    background: #f8fbff;
+}
+
+.file-number {
+    font-weight: 700;
+    color: #1769aa;
+}
+
+.parties {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.small-info {
+    font-size: 14px;
+    color: #53657b;
+}
+
+.date {
+    font-weight: 700;
+}
+
+.handler {
+    color: #9b5c00;
+    font-weight: 700;
+}
+
+.open-btn {
+    background: #edf5fc;
+    border: 0;
+    color: #1769aa;
+    padding: 9px 12px;
+    border-radius: 7px;
+    font-weight: 700;
+}
+
+.empty {
+    padding: 40px;
+    text-align: center;
+    color: #69798c;
+}
+
+/* MODAL */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(8,20,36,.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+}
+
+.modal-backdrop.show {
+    display: flex;
+}
+
+.modal {
+    width: min(850px, 100%);
+    max-height: 92vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 14px;
+    padding: 25px;
+}
+
+.modal h2 {
+    margin-top: 0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field.full {
+    grid-column: 1 / -1;
+}
+
+.field label {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.field input,
+.field select,
+.field textarea {
+    border: 1px solid #d3dce7;
+    border-radius: 8px;
+    padding: 11px;
+    background: white;
+}
+
+.field textarea {
+    min-height: 95px;
+    resize: vertical;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.secondary {
+    background: #edf1f5;
+    border: 0;
+    padding: 11px 17px;
+    border-radius: 8px;
+}
+
+/* CASE VIEW */
+
+.case-view {
+    display: none;
+}
+
+.case-view.show {
+    display: block;
+}
+
+.case-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.back {
+    background: white;
+    border: 1px solid #d7e0e9;
+    padding: 11px 16px;
+    border-radius: 8px;
+    color: #1769aa;
+    font-weight: 700;
+}
+
+.edit {
+    background: #1769aa;
+    color: white;
+    border: 0;
+    padding: 11px 17px;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+.summary {
+    background: white;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.summary-title {
+    font-size: 25px;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+}
+
+.summary-item span {
+    display: block;
+    color: #718096;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.summary-item strong {
+    font-size: 15px;
+}
+
+.activities {
+    margin-top: 22px;
+}
+
+.activity {
+    background: white;
+    border-left: 4px solid #1769aa;
+    padding: 19px;
+    margin-bottom: 12px;
+    border-radius: 0 9px 9px 0;
+    box-shadow: 0 2px 7px rgba(0,0,0,.04);
+}
+
+.activity.current {
+    border-left-color: #16825d;
+}
+
+.activity-date {
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.activity-purpose {
+    margin-top: 5px;
+    font-weight: 700;
+}
+
+.activity-details {
+    margin-top: 10px;
+    color: #4c5d70;
+    line-height: 1.6;
+}
+
+.responsible {
+    display: inline-block;
+    margin-top: 9px;
+    background: #fff3df;
+    color: #925700;
+    padding: 6px 9px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* CALENDAR */
+
+.calendar-wrap {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.calendar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.calendar-top button {
+    border: 0;
+    background: #edf3f8;
+    padding: 9px 13px;
+    border-radius: 7px;
+}
+
+.month-title {
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-top: 1px solid #e2e8f0;
+    border-left: 1px solid #e2e8f0;
+}
+
+.weekday,
+.day {
+    border-right: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.weekday {
+    padding: 10px;
+    background: #f4f7fa;
+    font-weight: 700;
+    text-align: center;
+}
+
+.day {
+    min-height: 105px;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.day:hover {
+    background: #f8fbff;
+}
+
+.day-number {
+    font-weight: 800;
+}
+
+.event {
+    margin-top: 6px;
+    background: #e8f3fb;
+    color: #155b89;
+    padding: 4px 6px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.day.today-day {
+    background: #f1f8ff;
+}
+
+/* DAY RESULTS */
+
+.day-results {
+    margin-top: 20px;
+}
+
+.group {
+    background: white;
+    border-radius: 10px;
+    padding: 17px;
+    margin-bottom: 12px;
+}
+
+.group-title {
+    font-weight: 800;
+    font-size: 17px;
+    margin-bottom: 5px;
+}
+
+.group-subtitle {
+    color: #68798d;
+    font-size: 13px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 1000px) {
+    .matter-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media(max-width: 650px) {
+    .header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .today {
+        text-align: left;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .field.full {
+        grid-column: auto;
+    }
+
+    .matter-row {
+        grid-template-columns: 1fr;
+    }
+
+    .calendar-grid {
+        font-size: 12px;
+    }
+
+    .day {
+        min-height: 80px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <div>
+        <div class="brand">Wambua Kilonzo &amp; Co. Advs.</div>
+        <div class="brand-sub">COURT DIARY &amp; MATTER MANAGEMENT SYSTEM</div>
+    </div>
+
+    <div class="today" id="todayDisplay"></div>
+</header>
+
+<main class="container">
+
+    <!-- STATIONS -->
+    <div class="station-bar" id="stationBar"></div>
+
+    <!-- MAIN APPLICATION -->
+    <div id="mainApp">
+
+        <div class="menu" id="menu">
+            <button data-section="all" class="active">All Matters</button>
+            <button data-section="hearing">Hearings</button>
+            <button data-section="mention">Mentions</button>
+            <button data-section="judgment">Judgments</button>
+            <button data-section="taxation">Taxations</button>
+            <button data-section="ruling">Rulings</button>
+            <button data-section="application">Hearing of Applications</button>
+            <button data-section="closed">Closed Matters</button>
+            <button data-section="calendar">Calendar</button>
+            <button data-section="search">Search</button>
+        </div>
+
+        <div class="toolbar">
+            <div class="search">
+                <input id="searchInput"
+                       type="text"
+                       placeholder="Search case number, parties, station or matter...">
+            </div>
+
+            <button class="primary" id="addMatterBtn">+ Add Matter</button>
+        </div>
+
+        <section id="listSection">
+            <h2 class="section-heading" id="sectionHeading">All Matters</h2>
+            <div id="matterList"></div>
+        </section>
+
+        <section id="calendarSection" style="display:none">
+            <div class="calendar-wrap">
+                <div class="calendar-top">
+                    <button id="previousMonth">← Previous</button>
+                    <div class="month-title" id="monthTitle"></div>
+                    <button id="nextMonth">Next →</button>
+                </div>
+
+                <div class="calendar-grid" id="calendarGrid"></div>
+
+                <div class="day-results" id="dayResults"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- CASE VIEW -->
+    <section id="caseView" class="case-view">
+
+        <div class="case-header">
+            <button class="back" id="backBtn">← Back to diary</button>
+            <button class="edit" id="editMatterBtn">Edit Matter</button>
+        </div>
+
+        <div id="caseContent"></div>
+
+    </section>
+
+</main>
+
+<!-- MATTER MODAL -->
+<div class="modal-backdrop" id="matterModal">
+    <div class="modal">
+
+        <h2 id="modalTitle">Add Court Matter</h2>
+
+        <form id="matterForm">
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label>Court Station</label>
+                    <select id="station" required></select>
+                </div>
+
+                <div class="field">
+                    <label>Court Type</label>
+                    <select id="courtType" required></select>
+                </div>
+
+                <div class="field">
+                    <label>Case Number</label>
+                    <input id="caseNumber" required placeholder="e.g. HCCA E005 of 2026">
+                </div>
+
+                <div class="field">
+                    <label>Court Number</label>
+                    <input id="courtNumber" placeholder="e.g. Court 4 / Hon. Too">
+                </div>
+
+                <div class="field full">
+                    <label>Client Name / Matter</label>
+                    <input id="client" required placeholder="Enter parties / client / matter">
+                </div>
+
+                <div class="field full">
+                    <label>What the Matter is Coming Up For</label>
+                    <select id="purpose" required>
+                        <option value="">Select...</option>
+                        <option>Hearing</option>
+                        <option>Mention</option>
+                        <option>Judgment</option>
+                        <option>Taxation</option>
+                        <option>Ruling</option>
+                        <option>Hearing of Application</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Upcoming Court Date</label>
+                    <input id="upcomingDate" type="date" required>
+                </div>
+
+                <div class="field">
+                    <label>To Be Done By</label>
+                    <input id="handler" placeholder="Person handling the matter">
+                </div>
+
+                <div class="field full">
+                    <label>Notes</label>
+                    <textarea id="notes" placeholder="Additional notes..."></textarea>
+                </div>
+
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="secondary" id="cancelModal">Cancel</button>
+                <button type="submit" class="primary">Save Matter</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- OUTCOME MODAL -->
+<div class="modal-backdrop" id="outcomeModal">
+    <div class="modal">
+
+        <h2>Record What Happened in Court</h2>
+
+        <form id="outcomeForm">
+
+            <div class="form-grid">
+
+                <div class="field full">
+                    <label>What Happened in Court</label>
+                    <textarea id="outcome" required
+                        placeholder="Enter the court outcome..."></textarea>
+                </div>
+
+                <div class="field">
+                    <label>Next Court Date</label>
+                    <input id="nextDate" type="date">
+                </div>
+
+                <div class="field">
+                    <label>Next Step / Coming Up For</label>
+                    <select id="nextPurpose">
+                        <option value="">Select...</option>
+                        <option>Hearing</option>
+                        <option>Mention</option>
+                        <option>Judgment</option>
+                        <option>Taxation</option>
+                        <option>Ruling</option>
+                        <option>Hearing of Application</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>To Be Done By</label>
+                    <input id="nextHandler" placeholder="Person handling the next step">
+                </div>
+
+                <div class="field">
+                    <label>Next Court Number</label>
+                    <input id="nextCourtNumber">
+                </div>
+
+                <div class="field full">
+                    <label>Additional Notes</label>
+                    <textarea id="outcomeNotes"></textarea>
+                </div>
+
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="secondary" id="cancelOutcome">Cancel</button>
+                <button type="submit" class="primary">Save Court Outcome</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+
+/* ============================================================
+   COURT DIARY DATA
+============================================================ */
+
+const SPECIAL_COURTS = [
+    "Garsen",
+    "Kiambu",
+    "Machakos",
+    "Makueni",
+    "Malindi",
+    "Milimani",
+    "Mombasa",
+    "Voi",
+    "Kwale"
+];
+
+const DEFAULT_STATIONS = [
+    "Garsen",
+    "Kiambu",
+    "Kilifi",
+    "Kwale",
+    "Machakos",
+    "Makueni",
+    "Malindi",
+    "Mariakani",
+    "Milimani",
+    "Mombasa",
+    "Mpeketoni",
+    "Msambweni",
+    "Voi"
+];
+
+let stations = JSON.parse(
+    localStorage.getItem("courtDiaryStations")
+) || DEFAULT_STATIONS;
+
+stations = [...new Set(stations)].sort((a,b) =>
+    a.localeCompare(b)
+);
+
+let matters = JSON.parse(
+    localStorage.getItem("courtDiaryMatters")
+) || [];
+
+let selectedStation = "ALL";
+let selectedSection = "all";
+let editingId = null;
+let openedMatterId = null;
+
+let calendarDate = new Date();
+let selectedCalendarDate = null;
+
+/* ============================================================
+   STORAGE
+============================================================ */
+
+function saveData() {
+    localStorage.setItem(
+        "courtDiaryStations",
+        JSON.stringify(stations)
+    );
+
+    localStorage.setItem(
+        "courtDiaryMatters",
+        JSON.stringify(matters)
+    );
+}
+
+/* ============================================================
+   DATE HELPERS
+============================================================ */
+
+function formatDate(dateString) {
+    if (!dateString) return "—";
+
+    const d = new Date(dateString + "T00:00:00");
+
+    return d.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    });
+}
+
+function todayISO() {
+    const d = new Date();
+
+    const month = String(d.getMonth() + 1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+
+    return `${d.getFullYear()}-${month}-${day}`;
+}
+
+function isPast(date) {
+    return date < todayISO();
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+document.getElementById("todayDisplay").textContent =
+    new Date().toLocaleDateString("en-GB", {
+        weekday:"long",
+        day:"numeric",
+        month:"long",
+        year:"numeric"
+    });
+
+/* ============================================================
+   STATION TABS
+============================================================ */
+
+function renderStations() {
+
+    const bar = document.getElementById("stationBar");
+
+    bar.innerHTML = "";
+
+    const all = document.createElement("button");
+
+    all.className =
+        "station-tab " +
+        (selectedStation === "ALL" ? "active" : "");
+
+    all.textContent = "All Stations";
+
+    all.onclick = () => {
+        selectedStation = "ALL";
+        renderStations();
+        renderCurrentSection();
+    };
+
+    bar.appendChild(all);
+
+    stations.forEach(station => {
+
+        const btn = document.createElement("button");
+
+        btn.className =
+            "station-tab " +
+            (selectedStation === station ? "active" : "");
+
+        btn.textContent = station;
+
+        btn.onclick = () => {
+            selectedStation = station;
+            renderStations();
+            renderCurrentSection();
+        };
+
+        bar.appendChild(btn);
+    });
+
+    const add = document.createElement("button");
+
+    add.className = "station-tab add-station";
+    add.textContent = "+ Add Station";
+
+    add.onclick = addStation;
+
+    bar.appendChild(add);
+}
+
+function addStation() {
+
+    const name = prompt("Enter the new court station:");
+
+    if (!name) return;
+
+    const clean = name.trim();
+
+    if (!clean) return;
+
+    if (stations.some(s =>
+        s.toLowerCase() === clean.toLowerCase()
+    )) {
+        alert("That station already exists.");
+        return;
+    }
+
+    stations.push(clean);
+
+    stations.sort((a,b) =>
+        a.localeCompare(b)
+    );
+
+    saveData();
+    renderStations();
+    populateStationSelect();
+}
+
+/* ============================================================
+   COURT TYPE
+============================================================ */
+
+function getCourtTypes(station) {
+
+    if (SPECIAL_COURTS.includes(station)) {
+        return [
+            "High Court",
+            "Magistrates Court"
+        ];
+    }
+
+    return ["Magistrates Court"];
+}
+
+function populateStationSelect() {
+
+    const select = document.getElementById("station");
+
+    select.innerHTML = "";
+
+    stations.forEach(station => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = station;
+        option.textContent = station;
+
+        select.appendChild(option);
+    });
+
+    updateCourtTypes();
+}
+
+function updateCourtTypes() {
+
+    const station =
+        document.getElementById("station").value;
+
+    const select =
+        document.getElementById("courtType");
+
+    select.innerHTML = "";
+
+    getCourtTypes(station).forEach(type => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = type;
+        option.textContent = type;
+
+        select.appendChild(option);
+    });
+}
+
+document.getElementById("station")
+    .addEventListener("change", updateCourtTypes);
+
+/* ============================================================
+   SECTION MENU
+============================================================ */
+
+document.querySelectorAll("#menu button").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        selectedSection =
+            button.dataset.section;
+
+        document.querySelectorAll("#menu button")
+            .forEach(b => b.classList.remove("active"));
+
+        button.classList.add("active");
+
+        if (selectedSection === "calendar") {
+
+            document.getElementById("listSection")
+                .style.display = "none";
+
+            document.getElementById("calendarSection")
+                .style.display = "block";
+
+            renderCalendar();
+
+        } else {
+
+            document.getElementById("listSection")
+                .style.display = "block";
+
+            document.getElementById("calendarSection")
+                .style.display = "none";
+
+            renderCurrentSection();
+        }
+    });
+});
+
+/* ============================================================
+   FILTERING
+============================================================ */
+
+function getFilteredMatters() {
+
+    let result = [...matters];
+
+    if (selectedStation !== "ALL") {
+        result = result.filter(m =>
+            m.station === selectedStation
+        );
+    }
+
+    if (selectedSection === "closed") {
+
+        result = result.filter(m =>
+            m.status === "closed"
+        );
+
+    } else {
+
+        result = result.filter(m =>
+            m.status !== "closed"
+        );
+
+        if (selectedSection !== "all" &&
+            selectedSection !== "search") {
+
+            result = result.filter(m =>
+                m.purposeKey === selectedSection
+            );
+        }
+    }
+
+    const search =
+        document.getElementById("searchInput")
+            .value.trim().toLowerCase();
+
+    if (search) {
+
+        result = result.filter(m => {
+
+            return [
+                m.station,
+                m.caseNumber,
+                m.client,
+                m.purpose,
+                m.courtType,
+                m.courtNumber,
+                m.handler
+            ].join(" ")
+             .toLowerCase()
+             .includes(search);
+
+        });
+    }
+
+    result.sort((a,b) =>
+        (a.upcomingDate || "")
+        .localeCompare(b.upcomingDate || "")
+    );
+
+    return result;
+}
+
+/* ============================================================
+   MATTER LIST
+============================================================ */
+
+function renderCurrentSection() {
+
+    const headings = {
+        all: "All Matters",
+        hearing: "Hearings",
+        mention: "Mentions",
+        judgment: "Judgments",
+        taxation: "Taxations",
+        ruling: "Rulings",
+        application: "Hearing of Applications",
+        closed: "Closed Matters",
+        search: "Search Results"
+    };
+
+    document.getElementById("sectionHeading")
+        .textContent =
+            headings[selectedSection] || "All Matters";
+
+    renderMatterList();
+}
+
+function renderMatterList() {
+
+    const container =
+        document.getElementById("matterList");
+
+    container.innerHTML = "";
+
+    const data = getFilteredMatters();
+
+    if (!data.length) {
+
+        container.innerHTML =
+            `<div class="empty">
+                No matters found.
+             </div>`;
+
+        return;
+    }
+
+    const groups = {};
+
+    data.forEach(m => {
+
+        if (!groups[m.station]) {
+            groups[m.station] = [];
+        }
+
+        groups[m.station].push(m);
+    });
+
+    Object.keys(groups)
+        .sort((a,b) => a.localeCompare(b))
+        .forEach(station => {
+
+            const heading =
+                document.createElement("div");
+
+            heading.className = "station-heading";
+
+            heading.textContent =
+                `COURT STATION · ${station}`;
+
+            container.appendChild(heading);
+
+            const list =
+                document.createElement("div");
+
+            list.className = "matter-list";
+
+            groups[station].forEach(m => {
+
+                const row =
+                    document.createElement("div");
+
+                row.className = "matter-row";
+
+                row.innerHTML = `
+                    <div class="file-number">
+                        ${escapeHTML(m.caseNumber)}
+                    </div>
+
+                    <div>
+                        <div class="parties">
+                            ${escapeHTML(m.client)}
+                        </div>
+                        <div class="small-info">
+                            ${escapeHTML(m.purpose)}
+                        </div>
+                    </div>
+
+                    <div class="small-info">
+                        ${escapeHTML(m.courtType)}
+                        — ${escapeHTML(m.courtNumber || "Court not specified")}
+                    </div>
+
+                    <div class="date">
+                        ${formatDate(m.upcomingDate)}
+                    </div>
+
+                    <div class="handler">
+                        ${m.handler
+                            ? "To Be Done By: " +
+                              escapeHTML(m.handler)
+                            : "To Be Done By: —"}
+                    </div>
+
+                    <div>
+                        <button class="open-btn">
+                            Open Matter
+                        </button>
+                    </div>
+                `;
+
+                row.querySelector(".open-btn")
+                    .onclick = () =>
+                        openMatter(m.id);
+
+                list.appendChild(row);
+            });
+
+            container.appendChild(list);
+        });
+}
+
+/* ============================================================
+   ADD MATTER
+============================================================ */
+
+document.getElementById("addMatterBtn")
+    .onclick = () => {
+
+        editingId = null;
+
+        document.getElementById("modalTitle")
+            .textContent = "Add Court Matter";
+
+        document.getElementById("matterForm")
+            .reset();
+
+        populateStationSelect();
+
+        if (selectedStation !== "ALL" &&
+            stations.includes(selectedStation)) {
+
+            document.getElementById("station")
+                .value = selectedStation;
+
+            updateCourtTypes();
+        }
+
+        document.getElementById("matterModal")
+            .classList.add("show");
+    };
+
+document.getElementById("cancelModal")
+    .onclick = closeMatterModal;
+
+function closeMatterModal() {
+
+    document.getElementById("matterModal")
+        .classList.remove("show");
+}
+
+document.getElementById("matterForm")
+    .addEventListener("submit", event => {
+
+        event.preventDefault();
+
+        const station =
+            document.getElementById("station").value;
+
+        const purpose =
+            document.getElementById("purpose").value;
+
+        const purposeKey =
+            purpose === "Hearing" ? "hearing" :
+            purpose === "Mention" ? "mention" :
+            purpose === "Judgment" ? "judgment" :
+            purpose === "Taxation" ? "taxation" :
+            purpose === "Ruling" ? "ruling" :
+            "application";
+
+        if (editingId) {
+
+            const matter =
+                matters.find(m => m.id === editingId);
+
+            matter.station = station;
+            matter.courtType =
+                document.getElementById("courtType").value;
+            matter.caseNumber =
+                document.getElementById("caseNumber").value.trim();
+            matter.client =
+                document.getElementById("client").value.trim();
+            matter.courtNumber =
+                document.getElementById("courtNumber").value.trim();
+            matter.upcomingDate =
+                document.getElementById("upcomingDate").value;
+            matter.purpose = purpose;
+            matter.purposeKey = purposeKey;
+            matter.handler =
+                document.getElementById("handler").value.trim();
+            matter.notes =
+                document.getElementById("notes").value.trim();
+
+        } else {
+
+            const matter = {
+
+                id: crypto.randomUUID(),
+
+                station,
+
+                courtType:
+                    document.getElementById("courtType").value,
+
+                caseNumber:
+                    document.getElementById("caseNumber")
+                        .value.trim(),
+
+                client:
+                    document.getElementById("client")
+                        .value.trim(),
+
+                courtNumber:
+                    document.getElementById("courtNumber")
+                        .value.trim(),
+
+                upcomingDate:
+                    document.getElementById("upcomingDate")
+                        .value,
+
+                purpose,
+
+                purposeKey,
+
+                handler:
+                    document.getElementById("handler")
+                        .value.trim(),
+
+                notes:
+                    document.getElementById("notes")
+                        .value.trim(),
+
+                status: "active",
+
+                history: []
+            };
+
+            matters.push(matter);
+        }
+
+        saveData();
+
+        closeMatterModal();
+
+        renderCurrentSection();
+    });
+
+/* ============================================================
+   OPEN MATTER
+============================================================ */
+
+function openMatter(id) {
+
+    openedMatterId = id;
+
+    document.getElementById("mainApp")
+        .style.display = "none";
+
+    document.getElementById("caseView")
+        .classList.add("show");
+
+    renderCase();
+}
+
+function renderCase() {
+
+    const matter =
+        matters.find(m => m.id === openedMatterId);
+
+    if (!matter) return;
+
+    const content =
+        document.getElementById("caseContent");
+
+    content.innerHTML = `
+
+        <div class="summary">
+
+            <div class="summary-title">
+                ${escapeHTML(matter.client)}
+            </div>
+
+            <div class="summary-grid">
+
+                <div class="summary-item">
+                    <span>Case Number</span>
+                    <strong>
+                        ${escapeHTML(matter.caseNumber)}
+                    </strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>Client / Matter</span>
+                    <strong>
+                        ${escapeHTML(matter.client)}
+                    </strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>Station</span>
+                    <strong>
+                        ${escapeHTML(matter.station)}
+                    </strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>Court Type</span>
+                    <strong>
+                        ${escapeHTML(matter.courtType)}
+                    </strong>
+                </div>
+
+                <div class="summary-item">
+                    <span>Court Number</span>
+                    <strong>
+                        ${escapeHTML(matter.courtNumber || "—")}
+                    </strong>
+                </div>
+
+            </div>
+
+            <div class="activities">
+
+                <h2>Activities</h2>
+
+                <div id="activityList"></div>
+
+                ${
+                    matter.status !== "closed"
+                    ? `
+                    <button class="primary"
+                            id="recordOutcomeBtn">
+                        + Record Court Outcome
+                    </button>
+
+                    <button class="secondary"
+                            id="closeMatterBtn"
+                            style="margin-left:8px">
+                        Close Matter
+                    </button>
+                    `
+                    : `
+                    <div style="margin-top:15px;
+                                font-weight:700;
+                                color:#8b3030">
+                        This matter is closed.
+                    </div>
+                    `
+                }
+
+            </div>
+
+        </div>
+    `;
+
+    renderActivities(matter);
+
+    if (matter.status !== "closed") {
+
+        document.getElementById("recordOutcomeBtn")
+            .onclick = () =>
+                openOutcomeModal(matter);
+
+        document.getElementById("closeMatterBtn")
+            .onclick = () =>
+                closeMatter(matter.id);
+    }
+}
+
+/* ============================================================
+   ACTIVITIES
+============================================================ */
+
+function renderActivities(matter) {
+
+    const list =
+        document.getElementById("activityList");
+
+    list.innerHTML = "";
+
+    /*
+       CURRENT UPCOMING ACTIVITY FIRST
+    */
+
+    if (matter.status !== "closed") {
+
+        const current =
+            document.createElement("div");
+
+        current.className =
+            "activity current";
+
+        current.innerHTML = `
+
+            <div class="activity-date">
+                Upcoming · ${formatDate(matter.upcomingDate)}
+            </div>
+
+            <div class="activity-purpose">
+                ${escapeHTML(matter.purpose)}
+            </div>
+
+            <div class="activity-details">
+
+                ${escapeHTML(matter.courtType)}
+                — ${escapeHTML(matter.courtNumber || "Court not specified")}
+
+                ${
+                    matter.notes
+                    ? `<br>${escapeHTML(matter.notes)}`
+                    : ""
+                }
+
+            </div>
+
+            <div class="responsible">
+                To Be Done By:
+                ${escapeHTML(matter.handler || "Not assigned")}
+            </div>
+
+        `;
+
+        list.appendChild(current);
+    }
+
+    /*
+       PREVIOUS ACTIVITIES
+    */
+
+    [...(matter.history || [])]
+        .sort((a,b) =>
+            (b.date || "").localeCompare(a.date || "")
+        )
+        .forEach(activity => {
+
+            const item =
+                document.createElement("div");
+
+            item.className = "activity";
+
+            item.innerHTML = `
+
+                <div class="activity-date">
+                    ${formatDate(activity.date)}
+                </div>
+
+                <div class="activity-purpose">
+                    ${escapeHTML(activity.purpose || "")}
+                </div>
+
+                <div class="activity-details">
+
+                    <strong>Court:</strong>
+                    ${escapeHTML(activity.courtType || "")}
+                    —
+                    ${escapeHTML(activity.courtNumber || "—")}
+
+                    <br>
+
+                    <strong>What Happened:</strong>
+                    ${escapeHTML(activity.outcome || "—")}
+
+                    ${
+                        activity.nextDate
+                        ? `<br>
+                           <strong>Next Date:</strong>
+                           ${formatDate(activity.nextDate)}`
+                        : ""
+                    }
+
+                    ${
+                        activity.nextPurpose
+                        ? `<br>
+                           <strong>Next Step:</strong>
+                           ${escapeHTML(activity.nextPurpose)}`
+                        : ""
+                    }
+
+                    ${
+                        activity.notes
+                        ? `<br>
+                           <strong>Notes:</strong>
+                           ${escapeHTML(activity.notes)}`
+                        : ""
+                    }
+
+                </div>
+
+                ${
+                    activity.nextHandler
+                    ? `
+                    <div class="responsible">
+                        To Be Done By:
+                        ${escapeHTML(activity.nextHandler)}
+                    </div>
+                    `
+                    : ""
+                }
+
+            `;
+
+            list.appendChild(item);
+        });
+}
+
+/* ============================================================
+   OUTCOME
+============================================================ */
+
+function openOutcomeModal(matter) {
+
+    document.getElementById("outcomeForm")
+        .reset();
+
+    document.getElementById("outcomeModal")
+        .classList.add("show");
+}
+
+document.getElementById("cancelOutcome")
+    .onclick = () => {
+
+        document.getElementById("outcomeModal")
+            .classList.remove("show");
+    };
+
+document.getElementById("outcomeForm")
+    .addEventListener("submit", event => {
+
+        event.preventDefault();
+
+        const matter =
+            matters.find(m =>
+                m.id === openedMatterId
+            );
+
+        if (!matter) return;
+
+        /*
+          Preserve the current/upcoming entry
+          permanently in history.
+        */
+
+        matter.history =
+            matter.history || [];
+
+        matter.history.push({
+
+            date: matter.upcomingDate,
+
+            purpose: matter.purpose,
+
+            courtType: matter.courtType,
+
+            courtNumber: matter.courtNumber,
+
+            outcome:
+                document.getElementById("outcome")
+                    .value.trim(),
+
+            nextDate:
+                document.getElementById("nextDate")
+                    .value,
+
+            nextPurpose:
+                document.getElementById("nextPurpose")
+                    .value,
+
+            nextHandler:
+                document.getElementById("nextHandler")
+                    .value.trim(),
+
+            notes:
+                document.getElementById("outcomeNotes")
+                    .value.trim()
+        });
+
+        const nextDate =
+            document.getElementById("nextDate").value;
+
+        if (nextDate) {
+
+            /*
+              RETURN MATTER TO UPCOMING DIARY
+            */
+
+            matter.upcomingDate = nextDate;
+
+            matter.purpose =
+                document.getElementById("nextPurpose")
+                    .value || matter.purpose;
+
+            matter.purposeKey =
+                matter.purpose === "Hearing"
+                    ? "hearing"
+                    : matter.purpose === "Mention"
+                    ? "mention"
+                    : matter.purpose === "Judgment"
+                    ? "judgment"
+                    : matter.purpose === "Taxation"
+                    ? "taxation"
+                    : matter.purpose === "Ruling"
+                    ? "ruling"
+                    : "application";
+
+            matter.handler =
+                document.getElementById("nextHandler")
+                    .value.trim();
+
+            matter.courtNumber =
+                document.getElementById("nextCourtNumber")
+                    .value.trim() ||
+                matter.courtNumber;
+
+            matter.status = "active";
+
+        } else {
+
+            /*
+              No next date = keep the matter in
+              the system but it will have no
+              upcoming date.
+            */
+
+            matter.status = "active";
+        }
+
+        saveData();
+
+        document.getElementById("outcomeModal")
+            .classList.remove("show");
+
+        renderCase();
+    });
+
+/* ============================================================
+   CLOSE MATTER
+============================================================ */
+
+function closeMatter(id) {
+
+    const matter =
+        matters.find(m => m.id === id);
+
+    if (!matter) return;
+
+    if (!confirm(
+        "Close this matter? It will leave the active diary and remain permanently recorded under Closed Matters."
+    )) return;
+
+    matter.status = "closed";
+
+    saveData();
+
+    renderCase();
+}
+
+/* ============================================================
+   EDIT MATTER
+============================================================ */
+
+document.getElementById("editMatterBtn")
+    .onclick = () => {
+
+        const matter =
+            matters.find(m =>
+                m.id === openedMatterId
+            );
+
+        if (!matter) return;
+
+        editingId = matter.id;
+
+        document.getElementById("modalTitle")
+            .textContent = "Edit Matter";
+
+        populateStationSelect();
+
+        document.getElementById("station")
+            .value = matter.station;
+
+        updateCourtTypes();
+
+        document.getElementById("courtType")
+            .value = matter.courtType;
+
+        document.getElementById("caseNumber")
+            .value = matter.caseNumber;
+
+        document.getElementById("client")
+            .value = matter.client;
+
+        document.getElementById("courtNumber")
+            .value = matter.courtNumber || "";
+
+        document.getElementById("upcomingDate")
+            .value = matter.upcomingDate || "";
+
+        document.getElementById("purpose")
+            .value = matter.purpose;
+
+        document.getElementById("handler")
+            .value = matter.handler || "";
+
+        document.getElementById("notes")
+            .value = matter.notes || "";
+
+        document.getElementById("matterModal")
+            .classList.add("show");
+    };
+
+/* ============================================================
+   BACK
+============================================================ */
+
+document.getElementById("backBtn")
+    .onclick = () => {
+
+        openedMatterId = null;
+
+        document.getElementById("caseView")
+            .classList.remove("show");
+
+        document.getElementById("mainApp")
+            .style.display = "block";
+
+        renderCurrentSection();
+    };
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+document.getElementById("searchInput")
+    .addEventListener("input", () => {
+
+        if (selectedSection === "calendar") return;
+
+        renderMatterList();
+    });
+
+/* ============================================================
+   CALENDAR
+============================================================ */
+
+function renderCalendar() {
+
+    const year =
+        calendarDate.getFullYear();
+
+    const month =
+        calendarDate.getMonth();
+
+    document.getElementById("monthTitle")
+        .textContent =
+            calendarDate.toLocaleDateString(
+                "en-GB",
+                {
+                    month: "long",
+                    year: "numeric"
+                }
+            );
+
+    const grid =
+        document.getElementById("calendarGrid");
+
+    grid.innerHTML = "";
+
+    [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+    ].forEach(day => {
+
+        const el =
+            document.createElement("div");
+
+        el.className = "weekday";
+        el.textContent = day.substring(0,3);
+
+        grid.appendChild(el);
+    });
+
+    const first =
+        new Date(year, month, 1);
+
+    let startDay =
+        first.getDay();
+
+    /*
+      Convert Sunday=0 to Monday=0
+    */
+
+    startDay =
+        startDay === 0 ? 6 : startDay - 1;
+
+    for (let i = 0; i < startDay; i++) {
+
+        const empty =
+            document.createElement("div");
+
+        empty.className = "day";
+
+        grid.appendChild(empty);
+    }
+
+    const daysInMonth =
+        new Date(year, month + 1, 0)
+            .getDate();
+
+    for (let day = 1; day <= daysInMonth; day++) {
+
+        const el =
+            document.createElement("div");
+
+        el.className = "day";
+
+        const date =
+            `${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+
+        if (date === todayISO()) {
+            el.classList.add("today-day");
+        }
+
+        el.innerHTML =
+            `<div class="day-number">${day}</div>`;
+
+        let dayMatters =
+            matters.filter(m =>
+                m.status !== "closed" &&
+                m.upcomingDate === date &&
+                (
+                    selectedStation === "ALL" ||
+                    m.station === selectedStation
+                )
+            );
+
+        /*
+          Group calendar information by station/court/purpose
+        */
+
+        const groups = {};
+
+        dayMatters.forEach(m => {
+
+            const key =
+                `${m.station}|${m.courtType}|${m.courtNumber}|${m.purpose}`;
+
+            groups[key] =
+                (groups[key] || 0) + 1;
+        });
+
+        Object.entries(groups)
+            .slice(0, 3)
+            .forEach(([key,count]) => {
+
+                const [
+                    station,
+                    court,
+                    courtNumber,
+                    purpose
+                ] = key.split("|");
+
+                const event =
+                    document.createElement("div");
+
+                event.className = "event";
+
+                event.textContent =
+                    `${station} · ${purpose} (${count})`;
+
+                el.appendChild(event);
+            });
+
+        if (dayMatters.length > 3) {
+
+            const more =
+                document.createElement("div");
+
+            more.className = "event";
+
+            more.textContent =
+                `+ ${dayMatters.length - 3} more`;
+
+            el.appendChild(more);
+        }
+
+        el.onclick = () => {
+            selectedCalendarDate = date;
+            renderDayResults(dayMatters, date);
+        };
+
+        grid.appendChild(el);
+    }
+
+    if (selectedCalendarDate) {
+
+        const selected =
+            matters.filter(m =>
+                m.status !== "closed" &&
+                m.upcomingDate === selectedCalendarDate &&
+                (
+                    selectedStation === "ALL" ||
+                    m.station === selectedStation
+                )
+            );
+
+        renderDayResults(
+            selected,
+            selectedCalendarDate
+        );
+    }
+}
+
+function renderDayResults(dayMatters, date) {
+
+    const container =
+        document.getElementById("dayResults");
+
+    container.innerHTML = "";
+
+    if (!dayMatters.length) {
+
+        container.innerHTML =
+            `<div class="empty">
+                No active matters on
+                ${formatDate(date)}.
+             </div>`;
+
+        return;
+    }
+
+    const groups = {};
+
+    dayMatters.forEach(m => {
+
+        const key =
+            `${m.station}|${m.courtType}|${m.courtNumber}|${m.purpose}`;
+
+        if (!groups[key]) {
+            groups[key] = [];
+        }
+
+        groups[key].push(m);
+    });
+
+    const title =
+        document.createElement("h3");
+
+    title.textContent =
+        `Matters for ${formatDate(date)}`;
+
+    container.appendChild(title);
+
+    Object.entries(groups)
+        .forEach(([key, group]) => {
+
+            const [
+                station,
+                court,
+                courtNumber,
+                purpose
+            ] = key.split("|");
+
+            const box =
+                document.createElement("div");
+
+            box.className = "group";
+
+            box.innerHTML = `
+
+                <div class="group-title">
+                    ${escapeHTML(station)}
+                    ${escapeHTML(court)}
+                    — Before
+                    ${escapeHTML(courtNumber || "Court not specified")}
+                </div>
+
+                <div class="group-subtitle">
+                    ${group.length}
+                    ${escapeHTML(purpose)}
+                    ${group.length === 1 ? "" : "s"}
+                </div>
+
+            `;
+
+            group.forEach(m => {
+
+                const item =
+                    document.createElement("div");
+
+                item.style =
+                    "margin-top:12px;padding-top:10px;border-top:1px solid #edf1f5";
+
+                item.innerHTML = `
+
+                    <strong>
+                        ${escapeHTML(m.caseNumber)}
+                    </strong>
+
+                    —
+                    <strong>
+                        ${escapeHTML(m.client)}
+                    </strong>
+
+                    <br>
+
+                    <span class="small-info">
+                        To Be Done By:
+                        ${escapeHTML(m.handler || "Not assigned")}
+                    </span>
+
+                `;
+
+                item.onclick = () =>
+                    openMatter(m.id);
+
+                item.style.cursor = "pointer";
+
+                box.appendChild(item);
+            });
+
+            container.appendChild(box);
+        });
+}
+
+document.getElementById("previousMonth")
+    .onclick = () => {
+
+        calendarDate.setMonth(
+            calendarDate.getMonth() - 1
+        );
+
+        renderCalendar();
+    };
+
+document.getElementById("nextMonth")
+    .onclick = () => {
+
+        calendarDate.setMonth(
+            calendarDate.getMonth() + 1
+        );
+
+        renderCalendar();
+    };
+
+/* ============================================================
+   SECURITY AGAINST HTML INJECTION
+============================================================ */
+
+function escapeHTML(value) {
+
+    if (value === null ||
+        value === undefined) return "";
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+/* ============================================================
+   INITIALISE
+============================================================ */
+
+populateStationSelect();
+renderStations();
+renderCurrentSection();
+
+/*
+  Automatically save the data whenever the page
+  is being unloaded.
+*/
+
+window.addEventListener("beforeunload", saveData);
+
+</script>
+
+</body>
+</html>
+```
