@@ -1,4 +1,385 @@
 ```html
+<script type="module">
+
+import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    setDoc,
+    doc,
+    deleteDoc,
+    onSnapshot,
+    query,
+    orderBy
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+import {
+    getAuth,
+    signInAnonymously,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+
+/* ============================================================
+   FIREBASE CONFIGURATION
+   REPLACE THESE VALUES WITH YOUR FIREBASE PROJECT DETAILS
+============================================================ */
+
+const firebaseConfig = {
+
+    apiKey: "YOUR_API_KEY",
+
+    authDomain:
+        "YOUR_PROJECT.firebaseapp.com",
+
+    projectId:
+        "YOUR_PROJECT_ID",
+
+    storageBucket:
+        "YOUR_PROJECT.firebasestorage.app",
+
+    messagingSenderId:
+        "YOUR_MESSAGING_SENDER_ID",
+
+    appId:
+        "YOUR_APP_ID"
+};
+
+
+/* ============================================================
+   START FIREBASE
+============================================================ */
+
+const app =
+    initializeApp(firebaseConfig);
+
+const db =
+    getFirestore(app);
+
+const auth =
+    getAuth(app);
+
+
+/* ============================================================
+   SHARED COURT DIARY
+============================================================ */
+
+let matters = [];
+
+let stations = [
+    "Garsen",
+    "Kiambu",
+    "Kilifi",
+    "Kwale",
+    "Machakos",
+    "Makueni",
+    "Malindi",
+    "Mariakani",
+    "Milimani",
+    "Mombasa",
+    "Mpeketoni",
+    "Msambweni",
+    "Voi"
+].sort();
+
+
+/* ============================================================
+   USER LOGIN
+============================================================ */
+
+signInAnonymously(auth)
+    .catch(error => {
+
+        console.error(
+            "Authentication error:",
+            error
+        );
+
+        alert(
+            "Could not connect to the shared court diary."
+        );
+    });
+
+
+/* ============================================================
+   REAL-TIME MATTER LISTENER
+============================================================ */
+
+/*
+   IMPORTANT:
+
+   This replaces:
+
+       localStorage.getItem("courtDiaryMatters")
+
+   Every computer connected to the website listens to
+   this same Firestore collection.
+
+   When one user adds or changes a matter,
+   every connected computer receives the change.
+*/
+
+onAuthStateChanged(auth, user => {
+
+    if (!user) return;
+
+    const mattersRef =
+        collection(db, "courtDiaryMatters");
+
+    const diaryQuery =
+        query(
+            mattersRef,
+            orderBy("upcomingDate", "asc")
+        );
+
+    onSnapshot(
+        diaryQuery,
+
+        snapshot => {
+
+            matters = [];
+
+            snapshot.forEach(documentSnapshot => {
+
+                matters.push({
+
+                    id: documentSnapshot.id,
+
+                    ...documentSnapshot.data()
+
+                });
+
+            });
+
+            /*
+              Your existing display functions can now
+              display the shared matters.
+            */
+
+            renderCurrentSection();
+
+            if (
+                typeof renderCalendar === "function" &&
+                selectedSection === "calendar"
+            ) {
+                renderCalendar();
+            }
+
+            /*
+              If somebody else edits a matter while
+              you have it open, refresh the case view.
+            */
+
+            if (
+                openedMatterId &&
+                matters.some(
+                    m => m.id === openedMatterId
+                )
+            ) {
+
+                if (
+                    document
+                        .getElementById("caseView")
+                        .classList.contains("show")
+                ) {
+                    renderCase();
+                }
+            }
+
+        },
+
+        error => {
+
+            console.error(
+                "Firestore listener error:",
+                error
+            );
+
+            alert(
+                "The shared diary could not be synchronised."
+            );
+        }
+    );
+});
+
+
+/* ============================================================
+   ADD MATTER TO SHARED DATABASE
+============================================================ */
+
+async function saveMatterToCloud(matter) {
+
+    try {
+
+        /*
+          Firestore creates the permanent record.
+        */
+
+        const matterRef =
+            await addDoc(
+                collection(
+                    db,
+                    "courtDiaryMatters"
+                ),
+                matter
+            );
+
+        console.log(
+            "Matter saved:",
+            matterRef.id
+        );
+
+        return matterRef.id;
+
+    } catch (error) {
+
+        console.error(
+            "Could not save matter:",
+            error
+        );
+
+        alert(
+            "The matter could not be saved to the shared diary."
+        );
+
+        throw error;
+    }
+}
+
+
+/* ============================================================
+   UPDATE MATTER
+============================================================ */
+
+async function updateMatterInCloud(
+    matterId,
+    changes
+) {
+
+    try {
+
+        await setDoc(
+
+            doc(
+                db,
+                "courtDiaryMatters",
+                matterId
+            ),
+
+            changes,
+
+            {
+                merge: true
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Could not update matter:",
+            error
+        );
+
+        alert(
+            "The matter could not be updated."
+        );
+    }
+}
+
+
+/* ============================================================
+   DELETE MATTER
+============================================================ */
+
+async function permanentlyDeleteMatter(
+    matterId
+) {
+
+    try {
+
+        await deleteDoc(
+
+            doc(
+                db,
+                "courtDiaryMatters",
+                matterId
+            )
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Could not delete matter:",
+            error
+        );
+
+        alert(
+            "The matter could not be deleted."
+        );
+    }
+}
+
+
+/* ============================================================
+   EXAMPLE: ADDING A NEW MATTER
+============================================================ */
+
+async function addNewMatterExample() {
+
+    const matter = {
+
+        station: "Malindi",
+
+        courtType:
+            "Magistrates Court",
+
+        caseNumber:
+            "CMCC E001 of 2026",
+
+        client:
+            "Example Client",
+
+        courtNumber:
+            "Court 4",
+
+        upcomingDate:
+            "2026-10-05",
+
+        purpose:
+            "Hearing",
+
+        purposeKey:
+            "hearing",
+
+        handler:
+            "Sitaman",
+
+        notes:
+            "",
+
+        status:
+            "active",
+
+        history:
+            [],
+
+        createdAt:
+            new Date().toISOString()
+
+    };
+
+    await saveMatterToCloud(matter);
+}
+
+
+/* ============================================================
+   END FIREBASE CODE
+============================================================ */
+
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
